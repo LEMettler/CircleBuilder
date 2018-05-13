@@ -8,6 +8,9 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Vector2;
+
+import java.util.Arrays;
 
 public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
     final int FIELDX = 4;
@@ -19,6 +22,7 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 	private SpriteBatch batch;
 	private ShapeRenderer shapeRenderer;
 	private Circle[][] field;
+	private LineSegment[] line;
 	private BitmapFont count;
 
 	private int screenWidth, screenHeight;
@@ -35,6 +39,9 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 		shapeRenderer = new ShapeRenderer();
 		screenHeight = Gdx.graphics.getHeight();
         screenWidth = Gdx.graphics.getWidth();
+
+        line = new LineSegment[FIELDX * FIELDY + 1];
+        Arrays.fill(line,null);
 
         marginY = 0;
         marginX = 0;
@@ -80,7 +87,6 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
         shapeRenderer.setColor(Color.BLUE);
         for (int i = 0; i < FIELDY; i++) {
             for (int j = 0; j < FIELDX; j++) {
-                //activateCircle(Gdx.input.getX(),Gdx.input.getY(), field[j][i]);
 
                 if (field[j][i].getActivated()) {
                     shapeRenderer.setColor(Color.RED);
@@ -93,11 +99,19 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
             }
         }
 
+        shapeRenderer.setColor(Color.BLACK);
+        for (int i = 0; i < line.length; i++) {
+            if (line[i] !=null)
+                shapeRenderer.rectLine(line[i].getStart(),line[i].getEnd(),line[i].getWidth());
+        }
+
+        shapeRenderer.end();
+
         batch.begin();
         count.draw(batch,Integer.toString(countIndex),countX,countY);
         batch.end();
 
-        shapeRenderer.end();
+
 	}
 
         //finger on this circle -> activate(red)
@@ -106,13 +120,20 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
         x = circle.getX() - x;
         y = circle.getY() - y;
 
-        if (x * x + y * y <= circle.getRadius()* circle.getRadius()){
-            if ( (lastCircle == null )|| lastCircle.isNextTo(circle.getRow(),circle.getColumn())) {
+        if (x * x + y * y <= circle.getRadius()* circle.getRadius()){                               //TODO structure
+            if (( (lastCircle == null )|| lastCircle.isNextTo(circle.getRow(),circle.getColumn())) && !circle.getActivated()) {
 
                 if (!circle.getActivated()) {
                     countIndex++;
                 }
                 circle.setActivated(true);
+
+                if (lastCircle != null){
+                    Vector2 start = new Vector2(lastCircle.getX(), screenHeight - lastCircle.getY());
+                    Vector2 end = new Vector2( circle.getX(),screenHeight - circle.getY());
+                    line[countIndex] = new LineSegment(30, start, end);
+                }
+
                 lastCircle = circle;
             }
         }
@@ -136,7 +157,10 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
                 countIndex = 0;
             }
         }
+
+        Arrays.fill(line,null);
         lastCircle = null;
+
         return true;
     }
 
