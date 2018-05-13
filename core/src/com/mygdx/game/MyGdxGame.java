@@ -8,9 +8,6 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.input.GestureDetector;
-import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.Vector2;
 
 public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
     final int FIELDX = 4;
@@ -27,11 +24,11 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 	private int screenWidth, screenHeight;
 
 	private int countIndex, countX, countY;
+	private Circle lastCircle;
 
 	
 	@Override
 	public void create () {
-
 
 		batch = new SpriteBatch();
         Gdx.input.setInputProcessor(this);
@@ -41,6 +38,8 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 
         marginY = 0;
         marginX = 0;
+
+        lastCircle = null;
 
         count = new BitmapFont();
         countIndex = 0;
@@ -56,7 +55,7 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
         int squareY = 0;
         for (int i = 0; i <FIELDY; i++) {
             for (int j = 0; j < FIELDX; j++) {
-                field[j][i] = new Circle(squareX + squareRadius + marginX,squareY + squareRadius + marginY, squareRadius);
+                field[j][i] = new Circle(squareX + squareRadius + marginX,squareY + squareRadius + marginY, squareRadius,j,i);
                 squareX = squareX + squareSize;
             }
             squareY = squareY + squareSize;
@@ -108,10 +107,14 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
         y = circle.getY() - y;
 
         if (x * x + y * y <= circle.getRadius()* circle.getRadius()){
-            if (!circle.getActivated()) {
-                countIndex++;
+            if ( (lastCircle == null )|| lastCircle.isNextTo(circle.getRow(),circle.getColumn())) {
+
+                if (!circle.getActivated()) {
+                    countIndex++;
+                }
+                circle.setActivated(true);
+                lastCircle = circle;
             }
-            circle.setActivated(true);
         }
     }
 
@@ -133,6 +136,7 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
                 countIndex = 0;
             }
         }
+        lastCircle = null;
         return true;
     }
 
