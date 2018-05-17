@@ -2,17 +2,19 @@ package com.mygdx.game;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.math.Vector2;
 
 import java.util.Arrays;
 
-public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
+public class MyGdxGame extends ApplicationAdapter implements InputProcessor, GestureDetector.GestureListener{
     final int FIELDX = 4;
     final int FIELDY = 7;
 
@@ -40,7 +42,13 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 	public void create () {
 
 		batch = new SpriteBatch();
-        Gdx.input.setInputProcessor(this);
+
+        InputMultiplexer im = new InputMultiplexer();
+        GestureDetector gd = new GestureDetector(this);
+        im.addProcessor(gd);
+        im.addProcessor(this);
+        Gdx.input.setInputProcessor(im);
+
 		shapeRenderer = new ShapeRenderer();
 		screenHeight = Gdx.graphics.getHeight();
         screenWidth = Gdx.graphics.getWidth();
@@ -147,7 +155,7 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 	}
 
         //finger on this circle -> activate(red)
-    public void activateCircle(int x, int y, Circle circle, Boolean special){
+        private void activateCircle(int x, int y, Circle circle, Boolean special){
 
         x = circle.getX() - x;
         y = circle.getY() - y;
@@ -177,6 +185,26 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
         }
     }
 
+    private void blockCircle(int x, int y, Circle circle){
+        x = circle.getX() - x;
+        y = circle.getY() - y;
+
+            if (x * x + y * y <= circle.getRadius() * circle.getRadius()) {                               //TODO structure
+
+                if (circle.getBlocked()) {
+                    circle.setBlocked(false);
+                    barriers++;
+                }else {
+                    circle.setBlocked(true);
+                    barriers--;
+                }
+
+                freeFields = (FIELDX * FIELDY) - barriers;
+                }
+
+        }
+
+
     private void checkWin(){
         int startRow = startCircle.getRow();
         int startColumn = startCircle.getColumn();
@@ -189,8 +217,10 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         for (int i = 0; i < FIELDY; i++) {
             for (int j = 0; j < FIELDX; j++) {
-                activateCircle(Gdx.input.getX(), Gdx.input.getY(), field[j][i], true);
-                startCircle = field[j][i];
+                if (!field[j][i].getBlocked()) {
+                    activateCircle(Gdx.input.getX(), Gdx.input.getY(), field[j][i], true);  //todo first circle can be blocked
+                    startCircle = field[j][i];
+                }
             }
         }
         return true;
@@ -234,6 +264,17 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 
 
     @Override
+    public boolean longPress(float x, float y) {
+        for (int i = 0; i < FIELDY; i++) {
+            for (int j = 0; j < FIELDX; j++) {
+                blockCircle((int) x, (int) y, field[j][i]);
+            }
+        }
+        return true;
+    }
+
+
+    @Override
     public boolean keyDown(int keycode) {
         return false;
     }
@@ -258,5 +299,45 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
     @Override
     public boolean scrolled(int amount) {
         return false;
+    }
+
+    @Override
+    public boolean touchDown(float x, float y, int pointer, int button) {
+        return false;
+    }
+
+    @Override
+    public boolean tap(float x, float y, int count, int button) {
+        return false;
+    }
+
+    @Override
+    public boolean fling(float velocityX, float velocityY, int button) {
+        return false;
+    }
+
+    @Override
+    public boolean pan(float x, float y, float deltaX, float deltaY) {
+        return false;
+    }
+
+    @Override
+    public boolean panStop(float x, float y, int pointer, int button) {
+        return false;
+    }
+
+    @Override
+    public boolean zoom(float initialDistance, float distance) {
+        return false;
+    }
+
+    @Override
+    public boolean pinch(Vector2 initialPointer1, Vector2 initialPointer2, Vector2 pointer1, Vector2 pointer2) {
+        return false;
+    }
+
+    @Override
+    public void pinchStop() {
+
     }
 }
