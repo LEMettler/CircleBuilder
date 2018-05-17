@@ -7,17 +7,25 @@ package com.mygdx.game;
 public class Circle {
     private int x,y;
     private int radius;
+
     private Boolean activated;
+    private Boolean blocked;
+    private Boolean special;
+
     private int row,column;
 
-    public Circle(int x, int y, int size, int row, int column) {
+    public Circle(int x, int y, int radius, int row, int column) {
         this.x = x;
         this.y = y;
-        this.radius = size;
-        activated = false;
+        this.radius = radius;
         this.row = row;
         this.column = column;
+
+        activated = false;
+        blocked = false;
+        special = false;
     }
+
 
     public int getX() {
         return x;
@@ -65,6 +73,22 @@ public class Circle {
 
     public void setColumn(int column) {
         this.column = column;
+    }
+
+    public Boolean getBlocked() {
+        return blocked;
+    }
+
+    public void setBlocked(Boolean blocked) {
+        this.blocked = blocked;
+    }
+
+    public Boolean getSpecial() {
+        return special;
+    }
+
+    public void setSpecial(Boolean special) {
+        this.special = special;
     }
 
     public boolean isNextTo(int r, int c){
