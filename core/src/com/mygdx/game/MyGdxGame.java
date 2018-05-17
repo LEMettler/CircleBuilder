@@ -26,10 +26,14 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 	private BitmapFont count;
 
 	private int screenWidth, screenHeight;
+	private Boolean win;
 
 	private int countIndex, countX, countY;
 	private int barriers, freeFields;
+
 	private Circle lastCircle;
+	private Circle startCircle;
+	private Circle finishCircle;
 
 	
 	@Override
@@ -46,8 +50,11 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
 
         marginY = 0;
         marginX = 0;
+        win = false;
 
         lastCircle = null;
+        startCircle = null;
+        finishCircle = null;
 
         count = new BitmapFont();
         countIndex = 0;
@@ -119,7 +126,11 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
             }
         }
 
-        shapeRenderer.setColor(Color.BLACK);
+        if (win)
+        shapeRenderer.setColor(Color.GREEN);
+        else
+            shapeRenderer.setColor(Color.BLACK);
+
         for (int i = 0; i < line.length; i++) {
             if (line[i] !=null)
                 shapeRenderer.rectLine(line[i].getStart(),line[i].getEnd(),line[i].getWidth());
@@ -166,11 +177,20 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
         }
     }
 
+    private void checkWin(){
+        int startRow = startCircle.getRow();
+        int startColumn = startCircle.getColumn();
+
+        if (finishCircle.isNextTo(startRow,startColumn));
+            win = true;
+    }
+
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         for (int i = 0; i < FIELDY; i++) {
             for (int j = 0; j < FIELDX; j++) {
                 activateCircle(Gdx.input.getX(), Gdx.input.getY(), field[j][i], true);
+                startCircle = field[j][i];
             }
         }
         return true;
@@ -188,6 +208,7 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
         Arrays.fill(line,null);
         lastCircle = null;
         freeFields = (FIELDX * FIELDY) - barriers;
+        win = false;
 
         return true;
     }
@@ -202,6 +223,10 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor{
         for (int i = 0; i < FIELDY; i++) {
             for (int j = 0; j < FIELDX; j++) {
                 activateCircle(Gdx.input.getX(), Gdx.input.getY(), field[j][i], special);
+                if (freeFields == 0) {
+                    finishCircle = field[j][i];
+                    checkWin();
+                }
             }
         }
         return true;
