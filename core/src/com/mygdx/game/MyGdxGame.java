@@ -164,7 +164,7 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor, Ges
             if (x * x + y * y <= circle.getRadius() * circle.getRadius()) {                               //TODO structure
                 if (((lastCircle == null) || lastCircle.isNextTo(circle.getRow(), circle.getColumn())) && !circle.getActivated()) {
 
-                    if (!circle.getActivated()) {
+                    if (!circle.getActivated()) {   //todo still relevant?
                         countIndex++;
                     }
 
@@ -193,15 +193,13 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor, Ges
 
                 if (circle.getBlocked()) {
                     circle.setBlocked(false);
-                    barriers++;
+                    barriers--;
                 }else {
                     circle.setBlocked(true);
-                    barriers--;
+                    barriers++;
                 }
-
-                freeFields = (FIELDX * FIELDY) - barriers;
-                }
-
+            }
+        freeFields = (FIELDX * FIELDY) - barriers;
         }
 
 
