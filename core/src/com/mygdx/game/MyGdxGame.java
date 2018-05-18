@@ -128,7 +128,7 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor, Ges
                     shapeRenderer.circle(field[j][i].getX(), screenHeight - field[j][i].getY(), field[j][i].getRadius());
 
                 }else{
-                    shapeRenderer.setColor(Color.BLUE);
+                    shapeRenderer.setColor(Color.LIGHT_GRAY);
                     shapeRenderer.circle(field[j][i].getX(), screenHeight - field[j][i].getY(), field[j][i].getRadius());
                 }
             }
@@ -218,7 +218,7 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor, Ges
         for (int i = 0; i < FIELDY; i++) {
             for (int j = 0; j < FIELDX; j++) {
                 if (!field[j][i].getBlocked()) {
-                    activateCircle(Gdx.input.getX(), Gdx.input.getY(), field[j][i], true);  //todo first circle can be blocked
+                    activateCircle(Gdx.input.getX(), Gdx.input.getY(), field[j][i], true);
                     startCircle = field[j][i];
                 }
             }
@@ -246,16 +246,17 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor, Ges
     @Override
     public boolean touchDragged(int screenX, int screenY, int pointer) {
         Boolean special = false;
-
         if (freeFields == 1)
             special = true;
 
-        for (int i = 0; i < FIELDY; i++) {
-            for (int j = 0; j < FIELDX; j++) {
-                activateCircle(Gdx.input.getX(), Gdx.input.getY(), field[j][i], special);
-                if (freeFields == 0) {
-                    finishCircle = field[j][i];
-                    checkWin();
+        if (lastCircle != null){
+            for (int i = 0; i < FIELDY; i++) {
+                for (int j = 0; j < FIELDX; j++) {
+                    activateCircle(Gdx.input.getX(), Gdx.input.getY(), field[j][i], special);
+                    if (freeFields == 0) {
+                        finishCircle = field[j][i];
+                        checkWin();
+                    }
                 }
             }
         }
