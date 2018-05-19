@@ -134,24 +134,22 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor, Ges
             }
         }
 
-        if (win)
-        shapeRenderer.setColor(Color.GREEN);
-        else
+        if (win) {
+            shapeRenderer.setColor(Color.GREEN);
+        }else {
             shapeRenderer.setColor(Color.BLACK);
+        }
 
         for (int i = 0; i < line.length; i++) {
             if (line[i] !=null)
                 shapeRenderer.rectLine(line[i].getStart(),line[i].getEnd(),line[i].getWidth());
         }
-
         shapeRenderer.end();
 
         batch.begin();
         //count.draw(batch,Integer.toString(countIndex),countX,countY);
         count.draw(batch,Integer.toString(freeFields),countX,countY);
         batch.end();
-
-
 	}
 
         //finger on this circle -> activate(red)
@@ -206,9 +204,11 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor, Ges
     private void checkWin(){
         int startRow = startCircle.getRow();
         int startColumn = startCircle.getColumn();
-
-        if (finishCircle.isNextTo(startRow,startColumn));
+        System.out.println("win test");
+        if (finishCircle.isNextTo(startRow,startColumn)) {
             win = true;
+            System.out.println("win");
+        }
     }
 
     @Override
@@ -217,7 +217,9 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor, Ges
             for (int j = 0; j < FIELDX; j++) {
                 if (!field[j][i].getBlocked()) {
                     activateCircle(Gdx.input.getX(), Gdx.input.getY(), field[j][i], true);
-                    startCircle = field[j][i];
+                    if (field[j][i].getSpecial()){
+                        startCircle = field[j][i];
+                    }
                 }
             }
         }
@@ -237,6 +239,8 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor, Ges
         lastCircle = null;
         freeFields = (FIELDX * FIELDY) - barriers;
         win = false;
+        finishCircle = null;
+        startCircle = null;
 
         return true;
     }
@@ -252,8 +256,10 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor, Ges
                 for (int j = 0; j < FIELDX; j++) {
                     activateCircle(Gdx.input.getX(), Gdx.input.getY(), field[j][i], special);
                     if (freeFields == 0) {
-                        finishCircle = field[j][i];
-                        checkWin();
+                        if (field[j][i].getSpecial()) {
+                            finishCircle = field[j][i];
+                            checkWin();
+                        }
                     }
                 }
             }

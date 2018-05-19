@@ -93,9 +93,9 @@ public class Circle {
 
     public boolean isNextTo(int r, int c){
         if ((r == row) || (c == column)) {
-            if ((r+1 == row)|| (r-1== row)) {
+            if ((r+1 == row) || (r-1== row)) {
                 return true;
-            }else if ((c+1 == column)|| (c-1== column)){
+            }else if ((c+1 == column) || (c-1== column)){
                 return true;
             }else{
                 return false;
