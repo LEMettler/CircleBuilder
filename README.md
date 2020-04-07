@@ -13,7 +13,6 @@ Several fields can be blocked by barriers, which can not be activated and must b
 
 **Phase 2**
 
-- will prob. start working on this aspect july/august
 
 Find the math whether an arrangement of barries makes a game solvable or not. Idealy this can be 
 implemented as a more or less random barrier-creating algorithm.
